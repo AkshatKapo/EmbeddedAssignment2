@@ -18,7 +18,7 @@ min_area = 500
 total_objects_detected = 0
 
 # Initialize variables for video writing
-video_output_path = "output_video.mp4"
+video_output_path = "output_video_with_bounding_boxes.mp4"
 frame_width, frame_height = None, None
 video_writer = None
 
@@ -50,18 +50,21 @@ for frame_name in frames:
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Count valid objects based on minimum area
-    object_count = sum(1 for contour in contours if cv2.contourArea(contour) > min_area)
+    # Count valid objects based on minimum area and draw bounding boxes
+    for contour in contours:
+        if cv2.contourArea(contour) > min_area:
+            # Draw bounding box around detected object
+            x, y, w, h = cv2.boundingRect(contour)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
     end_time = time.time()
     process_time = end_time - start_time
     timings.append(process_time)
-    total_objects_detected += object_count
+    total_objects_detected += len([c for c in contours if cv2.contourArea(c) > min_area])
 
     print(f"{frame_name} processed in {process_time:.4f} seconds")
-    print(f"Detected {object_count} significant objects in {frame_name}")
 
-    # Write the frame to the video
+    # Write the modified frame to the video
     video_writer.write(frame)
 
 # Release the video writer
@@ -73,3 +76,4 @@ avg_time = sum(timings) / len(timings) if timings else 0
 print(f"\nTotal objects detected across all frames: {total_objects_detected}")
 print(f"Average processing time per frame: {avg_time:.4f} seconds")
 print(f"Video saved to {video_output_path}")
+
