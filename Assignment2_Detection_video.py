@@ -16,7 +16,7 @@ upper_bound = np.array([255, 255, 255])
 minimum_area = 500 # shows  Minimum area to be considered a valid object
 
 total_objects_detected = 0 # Initialize variables for video writing
-video_output = "output_video2"
+video_output = "output_video.mp4"
 frame_width, frame_height = None, None
 video_writer = None
 
